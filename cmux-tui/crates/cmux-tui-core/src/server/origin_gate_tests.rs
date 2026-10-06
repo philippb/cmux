@@ -532,3 +532,22 @@ fn only_a_verified_app_sets_a_workspace_agent_folder() {
     assert_forbidden(&send(&mux, &app, &agent_folder(Some(json!({"claim": "app"})))));
     assert_not_forbidden(&send(&mux, &app, &agent_folder(None)));
 }
+
+/// The fast path reads the raw line: a `\u` escape in the operation name
+/// must not carry an A2 operation past the gate.
+#[test]
+fn an_escaped_operation_name_still_meets_gate_a2() {
+    let mux = mux("agent-folder-escaped");
+    let agent = connect(&mux);
+    let line = agent_folder(None).to_string().replace("agent_folder", "agent\\u005ffolder");
+    assert!(line.contains("\\u005f"), "{line}");
+    let request: Value = serde_json::from_str(&line).unwrap();
+    assert_eq!(request["operation"], "workspace.agent_folder.set");
+    assert!(handle_connection_message(&mux, agent.client, &line, &agent.writer, &agent.scheduler));
+    let reply: Value = serde_json::from_str(&agent.outbound.try_pop().unwrap()).unwrap();
+    assert_a2_refusal(&reply, "agent");
+    let line = install(None).to_string().replace("\"apps.", "\"\\u0061pps.");
+    assert!(handle_connection_message(&mux, agent.client, &line, &agent.writer, &agent.scheduler));
+    let reply: Value = serde_json::from_str(&agent.outbound.try_pop().unwrap()).unwrap();
+    assert_a2_refusal(&reply, "agent");
+}
