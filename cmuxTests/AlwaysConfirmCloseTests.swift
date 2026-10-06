@@ -1,5 +1,6 @@
 import AppKit
 import Bonsplit
+import CmuxControlSocket
 import CmuxSettings
 import Testing
 
@@ -199,6 +200,18 @@ struct AlwaysConfirmCloseTests {
 @MainActor
 @Suite(.serialized)
 struct AlwaysConfirmWindowCloseTests {
+    @Test func socketWindowCloseRemainsNoninteractive() throws {
+        try withWindow(alwaysWorkspace: true, alwaysWindow: true) { app, window, _ in
+            let windowId = try #require(app.mainWindowId(from: window))
+            var prompts = 0
+            app.debugCloseMainWindowConfirmationHandler = { _ in prompts += 1; return false }
+
+            #expect(TerminalController.shared.controlCloseWindow(id: windowId, force: false) == .resolved)
+            #expect(prompts == 0)
+            #expect(!window.isVisible)
+        }
+    }
+
     @Test func automaticShellExitKeepsExistingWindowClosePolicy() throws {
         try withWindow(alwaysWindow: true) { app, window, manager in
             let workspace = try #require(manager.selectedWorkspace)

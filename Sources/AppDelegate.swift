@@ -1397,6 +1397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// the should-close path treats the close as confirmed, so closing the last
     /// window does not stack a second "Quit cmux?" dialog on the first.
     private var preconfirmedMainWindowCloses: Set<ObjectIdentifier> = []
+    var automaticMainWindowCloses: Set<ObjectIdentifier> = []
     // Avoid showing the quit warning twice after confirmation.
     private var isQuitWarningConfirmed = false
     /// Set when Sparkle is about to relaunch to finish an update, so the terminate it
@@ -6653,88 +6654,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
     }
 
-    private func confirmCloseMainWindow(
-        _ window: NSWindow,
-        warningDefaults: UserDefaults,
-        dontAskAgain: CloseWarningKinds
-    ) -> Bool {
-#if DEBUG
-        if let debugCloseMainWindowConfirmationHandler {
-            let accepted = debugCloseMainWindowConfirmationHandler(window)
-            if debugCloseMainWindowDontAskAgainHandler?(dontAskAgain) == true {
-                CloseTabWarningStore(defaults: warningDefaults).disableWarnings(dontAskAgain)
-            }
-            return accepted
-        }
-#endif
-
-        let alert = NSAlert()
-        alert.alertStyle = .warning
-        alert.messageText = String(localized: "dialog.closeWindow.title", defaultValue: "Close window?")
-        alert.informativeText = String(
-            localized: "dialog.closeWindow.message",
-            defaultValue: "This will close the current window and all of its workspaces."
-        )
-        alert.addButton(withTitle: String(localized: "common.close", defaultValue: "Close"))
-        alert.addButton(withTitle: String(localized: "common.cancel", defaultValue: "Cancel"))
-
-        let alertWindow = alert.window
-        if let closeButton = alert.buttons.first {
-            alertWindow.defaultButtonCell = closeButton.cell as? NSButtonCell
-            alertWindow.initialFirstResponder = closeButton
-            DispatchQueue.main.async {
-                _ = alertWindow.makeFirstResponder(closeButton)
-            }
-        }
-
-        CloseDontAskAgainCheckbox.add(to: alert, offering: dontAskAgain)
-        let accepted = alert.runModal() == .alertFirstButtonReturn
-        CloseDontAskAgainCheckbox.apply(from: alert, offering: dontAskAgain, defaults: warningDefaults)
-        return accepted
-    }
-
-    @discardableResult
-    func closeWindowWithConfirmation(_ window: NSWindow) -> Bool {
-        guard isMainTerminalWindow(window) else {
-            window.performClose(nil)
-            return true
-        }
-        // Ask only when something would be lost, counting the window Dock that
-        // closes with the window. A close that skips the dialog is not
-        // preconfirmed, so the last-window quit policy still applies. Without a
-        // context there is no way to tell, so only the setting decides.
-        let shouldConfirm: Bool
-        var dontAskAgain: CloseWarningKinds = .window
-        let warningDefaults: UserDefaults
-        if let context = mainWindowContext(forExactWindowIdentity: window) {
-            warningDefaults = context.tabManager.closeTabWarningDefaults
-            let windowDockNeedsConfirmation = context.existingWindowDock()?.needsConfirmClose() == true
-            shouldConfirm = context.tabManager.shouldConfirmWindowClose(
-                windowDockNeedsConfirmation: windowDockNeedsConfirmation
-            )
-            if windowDockNeedsConfirmation
-                || context.tabManager.tabs.contains(where: {
-                    context.tabManager.workspaceNeedsConfirmClose($0)
-                }) {
-                dontAskAgain.insert(.safety)
-            }
-        } else {
-            warningDefaults = .standard
-            shouldConfirm = CloseTabWarningStore(defaults: warningDefaults).warnsBeforeClosingWindow
-        }
-        guard shouldConfirm else {
-            window.performClose(nil)
-            return true
-        }
-        guard confirmCloseMainWindow(
-            window,
-            warningDefaults: warningDefaults,
-            dontAskAgain: dontAskAgain
-        ) else { return true }
-        performPreconfirmedMainWindowClose(window)
-        return true
-    }
-
     /// Closes a main window whose close the user already confirmed. The
     /// window-should-close path still applies its last-window policy, but it
     /// does not ask the user a second time.
@@ -6934,7 +6853,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         notifyMainWindowContextsDidChange()
     }
 
-    private func mainWindowContext(forExactWindowIdentity window: NSWindow) -> MainWindowContext? {
+    func mainWindowContext(forExactWindowIdentity window: NSWindow) -> MainWindowContext? {
         let key = ObjectIdentifier(window)
         if let indexedContext = mainWindowContexts[key] {
             if indexedContext.window === window {
@@ -18762,7 +18681,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         _ candidateWindow: NSWindow,
         onCancel: (() -> Void)?
     ) -> Bool {
-        let closeAlreadyConfirmed = isMainWindowClosePreconfirmed(candidateWindow)
+        var closeAlreadyConfirmed = isMainWindowClosePreconfirmed(candidateWindow)
+        // The title-bar button reaches the delegate directly, bypassing the
+        // Close Window command. Keep its explicit protection on the same dialog.
+        if !closeAlreadyConfirmed, !automaticMainWindowCloses.contains(ObjectIdentifier(candidateWindow)),
+           !isTerminatingApp, !hasCommittedMainWindowClose(candidateWindow) {
+            let defaults = mainWindowContext(forExactWindowIdentity: candidateWindow)?
+                .tabManager.closeTabWarningDefaults ?? .standard
+            if AppCatalogSection().alwaysConfirmWindowClose.value(in: defaults) {
+                guard confirmCloseMainWindow(candidateWindow, warningDefaults: defaults, dontAskAgain: []) else {
+                    onCancel?()
+                    return false
+                }
+                closeAlreadyConfirmed = true
+            }
+        }
 #if DEBUG
         mainWindowShouldCloseObserverForTesting?(candidateWindow, closeAlreadyConfirmed)
 #endif
@@ -19195,17 +19128,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             if let exactWindow,
                NSApp.windows.contains(where: { $0 === exactWindow }) {
                 var vetoed = false
-                withPreconfirmedMainWindowClose(closeAlreadyConfirmed ? exactWindow : nil) {
-                    if let onCancelled,
-                       !handleMainTerminalWindowCloseRequest(
-                           exactWindow,
-                           windowId: windowId,
-                           onCancel: onCancelled
-                       ) {
-                        vetoed = true
-                        return
+                withAutomaticMainWindowClose(onCancelled != nil ? exactWindow : nil) {
+                    withPreconfirmedMainWindowClose(closeAlreadyConfirmed ? exactWindow : nil) {
+                        if let onCancelled,
+                           !handleMainTerminalWindowCloseRequest(
+                               exactWindow,
+                               windowId: windowId,
+                               onCancel: onCancelled
+                           ) {
+                            vetoed = true
+                            return
+                        }
+                        exactWindow.performClose(nil)
                     }
-                    exactWindow.performClose(nil)
                 }
                 if vetoed { return }
                 if !recordHistory,

@@ -920,7 +920,7 @@ extension Workspace {
         let eligibleByPanel = panelId.map { closeHistoryEligiblePanelIds.remove($0) != nil } ?? false
         return eligibleByTab || eligibleByPanel
     }
-    private func clearCloseHistoryEligibility(tabId: TabID, panelId: UUID? = nil) {
+    func clearCloseHistoryEligibility(tabId: TabID, panelId: UUID? = nil) {
         closeHistoryEligibleTabIds.remove(tabId)
         let resolvedPanelId = panelId ?? panelIdFromSurfaceId(tabId)
         if let resolvedPanelId {
@@ -4920,7 +4920,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         AppDelegate.shared?.remoteTmuxController.detachMirrorWorkspaceKeptOpenLocally(workspaceId: id)
         return true
     }
-    private func clearRemoteTmuxWorkspaceCloseIntent(tabId: TabID) {
+    func clearRemoteTmuxWorkspaceCloseIntent(tabId: TabID) {
         remoteTmuxWorkspaceCloseButtonByTabId.removeValue(forKey: tabId); remoteTmuxKeepWorkspaceOpenTabIds.remove(tabId)
         if remoteTmuxKeepWorkspaceOpenTabIds.isEmpty { remoteTmuxKeepWorkspaceOpenAfterSessionEnd = false }
     }
@@ -13629,7 +13629,7 @@ extension Workspace: PaneTreeHosting {
 
 extension Workspace: BonsplitDelegate {
     @MainActor
-    private func shouldCloseWorkspaceOnLastSurface(for tabId: TabID, tabStripClose: Bool) -> Bool { lastSurfaceClosePreference(for: tabId).map { tabStripClose ? $0 : true } ?? false }
+    func shouldCloseWorkspaceOnLastSurface(for tabId: TabID, tabStripClose: Bool) -> Bool { lastSurfaceClosePreference(for: tabId).map { tabStripClose ? $0 : true } ?? false }
 
     private func shouldKeepWorkspaceOpenOnLastSurface(for tabId: TabID, explicitUserClose: Bool, tabStripClose: Bool) -> Bool { (!explicitUserClose || tabStripClose) && lastSurfaceClosePreference(for: tabId) == false }
 
@@ -14230,6 +14230,8 @@ extension Workspace: BonsplitDelegate {
         let tabStripClose = tabCloseButtonClose != nil
         let explicitUserClose = explicitUserCloseTabIds.remove(tab.id) != nil || tabStripClose
 
+        if protectRemoteTmuxLastSurfaceClose(tabId: tab.id, explicitUserClose: explicitUserClose,
+                                             tabStripClose: tabStripClose, tabCloseButton: tabCloseButtonClose == true, forced: forceCloseTabIds.contains(tab.id)) { return false }
         // Remote tmux mirror tab closes route to tmux; tmux reports local removal.
         if isRemoteTmuxMirror, !forceCloseTabIds.contains(tab.id),
            let panelId = panelIdFromSurfaceId(tab.id),
@@ -14380,9 +14382,7 @@ extension Workspace: BonsplitDelegate {
             return true
         }
 
-        // If confirmation is required, Bonsplit will call into this delegate and we must return false.
-        // Show an app-level confirmation, then re-attempt the close with forceCloseTabIds to bypass
-        // this gating on the second pass.
+        // Confirm asynchronously, then retry with forceCloseTabIds to bypass this gate.
         let confirmationSource: CloseTabCloseSource = tabCloseButtonClose == true ? .tabCloseButton : .shortcut
         let agentWarning = activeAgentCloseWarningInfo(panelId: panelId)
         let warningKinds = CloseTabWarningStore(defaults: closeTabWarningDefaults).warningKindsIncludingSafety(

@@ -2875,36 +2875,22 @@ class TabManager: ObservableObject {
 
     @discardableResult
     func closeWorkspaceWithConfirmation(_ workspace: Workspace) -> Bool {
-        if workspace.isPinned {
-            let pinnedConfirmation = confirmPinnedWorkspaceClose(source: .workspace)
-            guard pinnedConfirmation != .cancelled else { return false }
-            return closeWorkspaceIfRunningProcess(
-                workspace,
-                requiresConfirmation: false,
-                closeAlreadyConfirmed: pinnedConfirmation == .confirmed
-            )
-        }
-        return closeWorkspaceIfRunningProcess(workspace)
+        closeWorkspaceWithConfirmation(workspace, source: .workspace)
     }
 
     @discardableResult
     func closeWorkspaceFromCloseTabGesture(_ workspace: Workspace) -> Bool {
-        if workspace.isPinned {
-            let pinnedConfirmation = confirmPinnedWorkspaceClose(source: .tabClose)
-            guard pinnedConfirmation != .cancelled else { return false }
-            return closeWorkspaceIfRunningProcess(
-                workspace,
-                requiresConfirmation: false,
-                closeAlreadyConfirmed: pinnedConfirmation == .confirmed
-            )
-        }
-        return closeWorkspaceIfRunningProcess(workspace, source: .tabClose)
+        closeWorkspaceWithConfirmation(workspace, source: .tabClose)
     }
 
     @discardableResult
     func closeWorkspaceFromTabCloseButton(_ workspace: Workspace) -> Bool {
+        closeWorkspaceWithConfirmation(workspace, source: .tabCloseButton)
+    }
+
+    private func closeWorkspaceWithConfirmation(_ workspace: Workspace, source: CloseConfirmationSource) -> Bool {
         if workspace.isPinned {
-            let pinnedConfirmation = confirmPinnedWorkspaceClose(source: .tabCloseButton)
+            let pinnedConfirmation = confirmPinnedWorkspaceClose(source: source)
             guard pinnedConfirmation != .cancelled else { return false }
             return closeWorkspaceIfRunningProcess(
                 workspace,
@@ -2912,7 +2898,7 @@ class TabManager: ObservableObject {
                 closeAlreadyConfirmed: pinnedConfirmation == .confirmed
             )
         }
-        return closeWorkspaceIfRunningProcess(workspace, source: .tabCloseButton)
+        return closeWorkspaceIfRunningProcess(workspace, source: source)
     }
 
     @discardableResult
@@ -2947,12 +2933,8 @@ class TabManager: ObservableObject {
 
         let plan = closeWorkspacesPlan(for: workspaces)
         var closeAlreadyConfirmed = false
-        // Members close below without their own prompts, so a batch holding a
-        // pinned workspace keeps the pinned gate instead of the workspace one.
-        // Closing every workspace closes the window, so that "Close window?"
-        // variant follows the window setting. Pinned workspaces never offer
-        // "Don't ask again": no setting may silence the protection pinning
-        // asked for.
+        // Protected workspaces and windows ask once, without offering suppression.
+        // Ordinary whole-window batches follow the existing window warning policy.
         let containsPinned = plan.workspaces.contains(where: \.isPinned)
         let windowDockNeedsConfirmation = plan.willCloseWindow
             && AppDelegate.shared?.existingWindowDock(for: self)?.needsConfirmClose() == true
@@ -2960,9 +2942,8 @@ class TabManager: ObservableObject {
             || windowDockNeedsConfirmation
         let showsBatchConfirmation: Bool
         var dontAskAgain: CloseWarningKinds
-        if containsPinned {
-            showsBatchConfirmation = CloseTabWarningStore(defaults: closeTabWarningDefaults)
-                .shouldConfirmCloseIncludingSafety(requiresConfirmation: true, source: .shortcut)
+        if containsPinned || alwaysConfirmWorkspaceClose || (plan.willCloseWindow && alwaysConfirmWindowClose) {
+            showsBatchConfirmation = true
             dontAskAgain = []
         } else if plan.willCloseWindow {
             // A batch that closes the whole window follows the window warning
@@ -3008,7 +2989,7 @@ class TabManager: ObservableObject {
         // confirmation or handling here.
         for workspace in anchorLastCloseOrder(plan.workspaces) {
             guard tabs.contains(where: { $0.id == workspace.id }) else { continue }
-            _ = closeWorkspaceIfRunningProcess(workspace, requiresConfirmation: false)
+            _ = closeWorkspaceIfRunningProcess(workspace, requiresConfirmation: false, closeAlreadyConfirmed: closeAlreadyConfirmed)
         }
     }
 
@@ -3266,13 +3247,14 @@ class TabManager: ObservableObject {
         let needsCloseConfirmation = workspaceNeedsConfirmClose(workspace)
             || windowDockNeedsConfirmation
         let showsCloseConfirmation = requiresConfirmation
-            && (needsCloseConfirmation
+            && (requiresAlwaysConfirmWorkspaceClose || needsCloseConfirmation
                 || shouldConfirmWorkspaceClose(
                     requiresConfirmation: needsCloseConfirmation,
                     source: source
                 ))
         var dontAskAgain: CloseWarningKinds = .workspace
         if needsCloseConfirmation { dontAskAgain.insert(.safety) }
+        if requiresAlwaysConfirmWorkspaceClose { dontAskAgain = [] }
         if showsCloseConfirmation,
            !confirmClose(
                title: String(localized: "dialog.closeWorkspace.title", defaultValue: "Close workspace?"),
@@ -3350,11 +3332,9 @@ class TabManager: ObservableObject {
         }
     }
 
-    /// Whether the Close Window command should ask before closing this
-    /// manager's window: `app.warnBeforeClosingWindow` is on and a panel that
-    /// closes with the window needs close confirmation, either in a workspace
-    /// or in the window Dock (which the caller owns and checks).
+    /// Explicit window protection or a live process requires confirmation.
     func shouldConfirmWindowClose(windowDockNeedsConfirmation: Bool) -> Bool {
+        if alwaysConfirmWindowClose { return true }
         let anyPanelNeedsConfirmation = windowDockNeedsConfirmation
             || tabs.contains(where: workspaceNeedsConfirmClose)
         if anyPanelNeedsConfirmation {
