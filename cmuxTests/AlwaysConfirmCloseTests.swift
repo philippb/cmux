@@ -200,6 +200,29 @@ struct AlwaysConfirmCloseTests {
 @MainActor
 @Suite(.serialized)
 struct AlwaysConfirmWindowCloseTests {
+    @Test(arguments: [true, false])
+    func lastWorkspaceAutomationCloseRemainsNoninteractive(_ socket: Bool) throws {
+        try withWindow(alwaysWorkspace: true, alwaysWindow: true) { app, window, manager in
+            let workspace = try #require(manager.selectedWorkspace)
+            let windowId = try #require(app.mainWindowId(from: window))
+            var prompts = 0
+            app.debugCloseMainWindowConfirmationHandler = { _ in prompts += 1; return false }
+            manager.confirmCloseHandler = { _, _, _ in prompts += 1; return false }
+
+            if socket {
+                let routing = ControlRoutingSelectors(hasWindowIDParam: true, windowID: windowId,
+                                                      groupID: nil, workspaceID: workspace.id,
+                                                      surfaceID: nil, paneID: nil)
+                #expect(TerminalController.shared.controlCloseWorkspace(routing: routing,
+                         workspaceID: workspace.id, force: false) == .resolved(windowID: windowId))
+            } else {
+                #expect(manager.closeWorkspaceNonInteractively(workspace, recordHistory: false))
+            }
+            #expect(prompts == 0)
+            #expect(!window.isVisible)
+        }
+    }
+
     @Test func socketWindowCloseRemainsNoninteractive() throws {
         try withWindow(alwaysWorkspace: true, alwaysWindow: true) { app, window, _ in
             let windowId = try #require(app.mainWindowId(from: window))
