@@ -236,6 +236,7 @@
 		A42100010000000000000001 /* AggregateMemoryPressureResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42100010000000000000002 /* AggregateMemoryPressureResponder.swift */; };
 		B11371000000000000000001 /* AggregateMemoryRetentionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11371000000000000000002 /* AggregateMemoryRetentionTests.swift */; };
 		A115C0DE0000000000000002 /* AllShortcutsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = A115C0DE0000000000000001 /* AllShortcutsPopover.swift */; };
+		427E0E2AA9EC214519D7A981 /* AlwaysConfirmCloseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3AFF14AF40D96F2C0985AA /* AlwaysConfirmCloseTests.swift */; };
 		9758A0000000000000000002 /* AmpVaultRegistrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9758A0000000000000000001 /* AmpVaultRegistrationTests.swift */; };
 		A54730000000000000000002 /* AntigravityHookSessionSnapshotRestoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54730000000000000000001 /* AntigravityHookSessionSnapshotRestoreTests.swift */; };
 		F4350A110000000000000001 /* AppBundleIconPersistencePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4350A130000000000000001 /* AppBundleIconPersistencePolicy.swift */; };
@@ -4806,6 +4807,7 @@
 		A42100010000000000000002 /* AggregateMemoryPressureResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/AggregateMemoryPressureResponder.swift; sourceTree = "<group>"; };
 		B11371000000000000000002 /* AggregateMemoryRetentionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregateMemoryRetentionTests.swift; sourceTree = "<group>"; };
 		A115C0DE0000000000000001 /* AllShortcutsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllShortcutsPopover.swift; sourceTree = "<group>"; };
+		EF3AFF14AF40D96F2C0985AA /* AlwaysConfirmCloseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlwaysConfirmCloseTests.swift"; sourceTree = "<group>"; };
 		9758A0000000000000000001 /* AmpVaultRegistrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpVaultRegistrationTests.swift; sourceTree = "<group>"; };
 		A54730000000000000000001 /* AntigravityHookSessionSnapshotRestoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntigravityHookSessionSnapshotRestoreTests.swift; sourceTree = "<group>"; };
 		F4350A130000000000000001 /* AppBundleIconPersistencePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/AppBundleIconPersistencePolicy.swift; sourceTree = "<group>"; };
@@ -13438,6 +13440,7 @@
 				50344B92A8552212731CAE50 /* CoderouterCLIAccountReaderTests.swift */,
 				87830970BF70E00C4E0C9D77 /* CloudTreeTestSupport.swift */,
 				3D3B724235A7A6C21D3D5F25 /* NewMachineSheetLayoutTests.swift */,
+				EF3AFF14AF40D96F2C0985AA /* AlwaysConfirmCloseTests.swift */,
 			);
 			path = cmuxTests;
 			sourceTree = "<group>";
@@ -17308,6 +17311,7 @@
 				A9E050000000000000000002 /* AgentSessionWebRendererTests.swift in Sources */,
 				FC23B4F0173B55B06DFE8DD4 /* AgentWakeVerificationTests.swift in Sources */,
 				B11371000000000000000001 /* AggregateMemoryRetentionTests.swift in Sources */,
+				427E0E2AA9EC214519D7A981 /* AlwaysConfirmCloseTests.swift in Sources */,
 				9758A0000000000000000002 /* AmpVaultRegistrationTests.swift in Sources */,
 				A54730000000000000000002 /* AntigravityHookSessionSnapshotRestoreTests.swift in Sources */,
 				725746692D9647948561044D /* AppDelegateBareSpaceShortcutRoutingTests.swift in Sources */,
