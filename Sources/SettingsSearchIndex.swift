@@ -90,6 +90,18 @@ enum SettingsSearchIndex {
         ),
         setting(
             .app,
+            "always-confirm-workspace-close",
+            String(localized: "settings.app.alwaysConfirmWorkspaceClose", defaultValue: "Always Confirm Workspace Closure"),
+            "always confirm close workspace confirmation"
+        ),
+        setting(
+            .app,
+            "always-confirm-window-close",
+            String(localized: "settings.app.alwaysConfirmWindowClose", defaultValue: "Always Confirm Window Closure"),
+            "always confirm close window confirmation"
+        ),
+        setting(
+            .app,
             "hide-tab-close-button",
             String(localized: "settings.app.hideTabCloseButton", defaultValue: "Hide Tab Close Button"),
             "hide x button close tab"
@@ -295,6 +307,8 @@ enum SettingsSearchIndex {
         "app.warnBeforeClosingTabXButton": settingID(for: .app, idSuffix: "warn-before-closing-tab-x-button"),
         "app.warnBeforeClosingWorkspace": settingID(for: .app, idSuffix: "warn-before-closing-workspace"),
         "app.warnBeforeClosingWindow": settingID(for: .app, idSuffix: "warn-before-closing-window"),
+        "app.alwaysConfirmWorkspaceClose": settingID(for: .app, idSuffix: "always-confirm-workspace-close"),
+        "app.alwaysConfirmWindowClose": settingID(for: .app, idSuffix: "always-confirm-window-close"),
         "app.hideTabCloseButton": settingID(for: .app, idSuffix: "hide-tab-close-button"),
         "app.renameSelectsExistingName": settingID(for: .app, idSuffix: "rename-selects-name"),
         "app.commandPaletteSearchesAllSurfaces": settingID(for: .app, idSuffix: "palette-search-all"),

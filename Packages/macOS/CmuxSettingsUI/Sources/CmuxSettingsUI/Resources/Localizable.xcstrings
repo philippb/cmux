@@ -14341,6 +14341,124 @@
           }
         }
       }
+    },
+    "settings.app.alwaysConfirmWindowClose.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Always ask before interactive window closures, even without running processes. Quit confirmation is configured separately."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلب التأكيد دائمًا عند إغلاق النوافذ تفاعليًا، حتى دون وجود عمليات قيد التشغيل. يُضبط تأكيد إنهاء التطبيق بشكل منفصل."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beim interaktiven Schließen von Fenstern immer nachfragen, auch ohne laufende Prozesse. Die Bestätigung beim Beenden wird separat eingestellt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedir siempre confirmación al cerrar ventanas de forma interactiva, incluso sin procesos en ejecución. La confirmación para salir se configura por separado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours demander confirmation lors de la fermeture interactive des fenêtres, même sans processus en cours. La confirmation pour quitter se règle séparément."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実行中のプロセスがなくても、操作でウィンドウを閉じるときに常に確認します。アプリ終了時の確認は別に設定します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실행 중인 프로세스가 없어도 창을 직접 닫을 때 항상 확인합니다. 앱 종료 확인은 별도로 설정합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交互式关闭窗口时始终询问，即使没有正在运行的进程。退出应用的确认需单独设置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "互動式關閉視窗時一律詢問，即使沒有執行中的程序。結束應用程式的確認需另外設定。"
+          }
+        }
+      }
+    },
+    "settings.app.alwaysConfirmWorkspaceClose.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Always ask before interactive workspace closures, even without running processes. Disable this protection in Settings."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلب التأكيد دائمًا عند إغلاق مساحات العمل تفاعليًا، حتى دون وجود عمليات قيد التشغيل. يمكن تعطيل هذه الحماية في الإعدادات."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beim interaktiven Schließen von Arbeitsbereichen immer nachfragen, auch ohne laufende Prozesse. Diesen Schutz in den Einstellungen deaktivieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedir siempre confirmación al cerrar espacios de trabajo de forma interactiva, incluso sin procesos en ejecución. Desactiva esta protección en Ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours demander confirmation lors de la fermeture interactive des espaces de travail, même sans processus en cours. Désactivez cette protection dans les réglages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実行中のプロセスがなくても、操作でワークスペースを閉じるときに常に確認します。この保護は設定で無効にできます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실행 중인 프로세스가 없어도 워크스페이스를 직접 닫을 때 항상 확인합니다. 설정에서 이 보호 기능을 끌 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交互式关闭工作区时始终询问，即使没有正在运行的进程。可在设置中停用此保护。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "互動式關閉工作區時一律詢問，即使沒有執行中的程序。可在設定中停用此保護。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

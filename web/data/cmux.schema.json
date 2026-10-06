@@ -820,6 +820,16 @@
           "default": true,
           "description": "Show a confirmation before closing a window with a running process, or all of a window's workspaces at once."
         },
+        "alwaysConfirmWorkspaceClose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Always require confirmation for interactive workspace closures, independently of conditional close warnings. Does not affect noninteractive CLI/API closure or Quit confirmation."
+        },
+        "alwaysConfirmWindowClose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Always require confirmation for interactive window closures, independently of conditional close warnings. Does not affect noninteractive CLI/API closure or Quit confirmation."
+        },
         "hideTabCloseButton": {
           "type": "boolean",
           "default": false,

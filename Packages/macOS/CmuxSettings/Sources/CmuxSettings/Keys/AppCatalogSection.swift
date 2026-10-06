@@ -268,6 +268,50 @@ public struct AppCatalogSection: SettingCatalogSection {
         )
     )
 
+    /// Requires confirmation for interactive workspace closures, independently of conditional warnings.
+    public let alwaysConfirmWorkspaceClose = DefaultsKey<Bool>(
+        id: "app.alwaysConfirmWorkspaceClose",
+        defaultValue: false,
+        userDefaultsKey: "alwaysConfirmWorkspaceClose",
+        userFacing: UserFacingSettingDescriptor(
+            title: String(
+                localized: "settings.app.alwaysConfirmWorkspaceClose",
+                defaultValue: "Always Confirm Workspace Closure"
+            ),
+            section: .app,
+            searchID: "always-confirm-workspace-close",
+            searchKeywords: ["always", "confirm", "close", "workspace", "confirmation"],
+            control: .toggle(.init(
+                commandPalette: .init(
+                    id: "alwaysConfirmWorkspaceClose",
+                    keywords: ["always", "confirm", "close", "workspace"]
+                )
+            ))
+        )
+    )
+
+    /// Requires confirmation for interactive window closures, independently of conditional warnings.
+    public let alwaysConfirmWindowClose = DefaultsKey<Bool>(
+        id: "app.alwaysConfirmWindowClose",
+        defaultValue: false,
+        userDefaultsKey: "alwaysConfirmWindowClose",
+        userFacing: UserFacingSettingDescriptor(
+            title: String(
+                localized: "settings.app.alwaysConfirmWindowClose",
+                defaultValue: "Always Confirm Window Closure"
+            ),
+            section: .app,
+            searchID: "always-confirm-window-close",
+            searchKeywords: ["always", "confirm", "close", "window", "confirmation"],
+            control: .toggle(.init(
+                commandPalette: .init(
+                    id: "alwaysConfirmWindowClose",
+                    keywords: ["always", "confirm", "close", "window"]
+                )
+            ))
+        )
+    )
+
     public let warnBeforeClosingTabXButton = DefaultsKey<Bool>(
         id: "app.warnBeforeClosingTabXButton",
         defaultValue: false,

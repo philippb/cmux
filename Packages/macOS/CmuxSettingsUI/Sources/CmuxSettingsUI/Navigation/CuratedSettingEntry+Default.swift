@@ -6,10 +6,8 @@ extension Array where Element == CuratedSettingEntry {
     ///
     /// Ported from the legacy `SettingsSearchIndex.settingEntries` +
     /// `SettingsSearchAliasIndex.settingAliases` tables in
-    /// `Sources/SettingsNavigation.swift` and
-    /// `Sources/SettingsSearchAliases.swift`. Roughly one row per
-    /// high-signal setting; the surface area is meant to mirror visible
-    /// rows users actually search for.
+    /// `Sources/SettingsNavigation.swift` and `Sources/SettingsSearchAliases.swift`.
+    /// Roughly one row per high-signal setting, mirroring visible rows users search for.
     ///
     /// Titles use the host app’s catalog, matching the visible rows.
     /// English titles remain search aliases alongside localized titles
@@ -124,6 +122,8 @@ extension Array where Element == CuratedSettingEntry {
             .init(section: .app, id: "warn-before-closing-tab-x-button", title: String(localized: "settings.app.warnBeforeClosingTabXButton", defaultValue: "Warn Before Tab Close Button"), synonyms: "Warn Before Tab Close Button app.warnBeforeClosingTabXButton x button close tab confirmation terminal surface"),
             .init(userFacing: catalog.app.warnBeforeClosingWorkspace),
             .init(userFacing: catalog.app.warnBeforeClosingWindow),
+            .init(userFacing: catalog.app.alwaysConfirmWorkspaceClose),
+            .init(userFacing: catalog.app.alwaysConfirmWindowClose),
             .init(userFacing: catalog.app.hideTabCloseButton),
             .init(userFacing: catalog.app.renameSelectsExistingName),
             .init(section: .app, id: "palette-search-all", title: String(localized: "settings.app.commandPaletteSearchAllSurfaces", defaultValue: "Command Palette Searches All Surfaces"), synonyms: "Command Palette Searches All Surfaces app.commandPaletteSearchesAllSurfaces command palette search all surfaces cmd-p terminal browser markdown"),

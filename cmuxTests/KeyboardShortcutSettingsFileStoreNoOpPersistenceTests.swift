@@ -144,6 +144,71 @@ struct KeyboardShortcutSettingsFileStoreNoOpPersistenceTests {
         #expect(defaults.persistentDomain(forName: defaultsSuiteName)?["appLanguageAppliedOverride"] == nil)
     }
 
+    @Test
+    func alwaysConfirmClosuresRoundTripIndependentlyThroughSettingsFile() async throws {
+        let suiteName = "AlwaysConfirmClosureSettingsFileTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let directoryURL = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directoryURL) }
+        let fileURL = directoryURL.appendingPathComponent("cmux.json")
+        try writeSettingsFile(
+            #"{"app":{"alwaysConfirmWorkspaceClose":true,"alwaysConfirmWindowClose":false}}"#,
+            to: fileURL
+        )
+
+        let app = AppCatalogSection()
+        let workspace = app.alwaysConfirmWorkspaceClose
+        let window = app.alwaysConfirmWindowClose
+        #expect(CmuxSettingsFileStore.supportedSettingsJSONPaths.contains(workspace.id))
+        #expect(CmuxSettingsFileStore.supportedSettingsJSONPaths.contains(window.id))
+        let importer = CmuxSettingsFileStore(
+            primaryPath: fileURL.path,
+            fallbackPath: nil,
+            additionalFallbackPaths: [],
+            notificationCenter: NotificationCenter(),
+            userDefaults: defaults,
+            languageSettingsStore: LanguageSettingsStore(defaults: defaults, domainName: suiteName),
+            startWatching: false,
+            isUserDefaultsKeyForcedByProfile: { _ in false }
+        )
+        #expect(defaults.object(forKey: workspace.userDefaultsKey) as? Bool == true)
+        #expect(defaults.object(forKey: window.userDefaultsKey) as? Bool == false)
+
+        let writer = JSONConfigStore(fileURL: fileURL)
+        let workspaceJSON = JSONKey<Bool>(id: workspace.id, defaultValue: false)
+        let windowJSON = JSONKey<Bool>(id: window.id, defaultValue: false)
+        _ = try await writer.setWithReceipt(false, for: workspaceJSON)
+        importer.reload()
+        #expect(!workspace.value(in: defaults))
+        #expect(!window.value(in: defaults))
+
+        _ = try await writer.setWithReceipt(true, for: windowJSON)
+        importer.reload()
+        #expect(!workspace.value(in: defaults))
+        #expect(window.value(in: defaults))
+        let savedRoot = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: fileURL)) as? [String: Any])
+        let savedApp = try #require(savedRoot["app"] as? [String: Any])
+        #expect(savedApp["alwaysConfirmWorkspaceClose"] as? Bool == false)
+        #expect(savedApp["alwaysConfirmWindowClose"] as? Bool == true)
+
+        // Reopening both stores verifies the durable file, rather than writer caches.
+        let freshWriter = JSONConfigStore(fileURL: fileURL)
+        #expect(try await freshWriter.value(for: workspaceJSON) == false)
+        #expect(try await freshWriter.value(for: windowJSON) == true)
+        _ = CmuxSettingsFileStore(
+            primaryPath: fileURL.path,
+            fallbackPath: nil,
+            additionalFallbackPaths: [],
+            notificationCenter: NotificationCenter(),
+            userDefaults: defaults,
+            startWatching: false,
+            isUserDefaultsKeyForcedByProfile: { _ in false }
+        )
+        #expect(!workspace.value(in: defaults))
+        #expect(window.value(in: defaults))
+    }
+
     private func makeTemporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(
             "cmux-settings-no-op-persistence-\(UUID().uuidString)",

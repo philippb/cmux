@@ -12,7 +12,8 @@ import SwiftUI
 /// Only, Show in Menu Bar, Unread Pane Ring, Pane Flash, Desktop
 /// Notifications, Notification Sound, Notification Command, Send
 /// anonymous telemetry, Warn Before Quit, Warn Before Closing Tab /
-/// X Button / Hide Tab Close Button, Rename Selects Existing Name,
+/// X Button / Always Confirm Workspace or Window Closure / Hide Tab Close Button,
+/// Rename Selects Existing Name,
 /// Command Palette Searches All Surfaces.
 @MainActor
 public struct AppSection: View {
@@ -75,6 +76,8 @@ public struct AppSection: View {
     @State private var warnCloseX: DefaultsValueModel<Bool>
     @State private var warnCloseWorkspace: DefaultsValueModel<Bool>
     @State private var warnCloseWindow: DefaultsValueModel<Bool>
+    @State private var alwaysConfirmWorkspaceClose: DefaultsValueModel<Bool>
+    @State private var alwaysConfirmWindowClose: DefaultsValueModel<Bool>
     @State private var hideCloseButton: DefaultsValueModel<Bool>
     @State private var renameSelects: DefaultsValueModel<Bool>
     @State private var paletteAllSurfaces: DefaultsValueModel<Bool>
@@ -150,6 +153,8 @@ public struct AppSection: View {
         _warnCloseX = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.warnBeforeClosingTabXButton))
         _warnCloseWorkspace = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.warnBeforeClosingWorkspace))
         _warnCloseWindow = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.warnBeforeClosingWindow))
+        _alwaysConfirmWorkspaceClose = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.alwaysConfirmWorkspaceClose))
+        _alwaysConfirmWindowClose = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.alwaysConfirmWindowClose))
         _hideCloseButton = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.hideTabCloseButton))
         _renameSelects = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.renameSelectsExistingName))
         _paletteAllSurfaces = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.app.commandPaletteSearchesAllSurfaces))
@@ -940,33 +945,13 @@ public struct AppSection: View {
             }
             SettingsCardDivider()
 
-            // Warn Before Closing Workspace
-            SettingsCardRow(
-                configurationReview: .json(catalog.app.warnBeforeClosingWorkspace.id),
-                catalog.app.warnBeforeClosingWorkspace.userFacing!.title,
-                subtitle: warnCloseWorkspace.current
-                    ? String(localized: "settings.app.warnBeforeClosingWorkspace.subtitleOn", defaultValue: "Show a confirmation before closing a workspace with a running process, or several workspaces at once.")
-                    : String(localized: "settings.app.warnBeforeClosingWorkspace.subtitleOff", defaultValue: "Workspaces close immediately without confirmation. Pinned workspaces still ask.")
-            ) {
-                Toggle("", isOn: Binding(get: { warnCloseWorkspace.current }, set: { warnCloseWorkspace.set($0) }))
-                    .labelsHidden()
-                    .controlSize(.small)
-            }
-            SettingsCardDivider()
-
-            // Warn Before Closing Window
-            SettingsCardRow(
-                configurationReview: .json(catalog.app.warnBeforeClosingWindow.id),
-                catalog.app.warnBeforeClosingWindow.userFacing!.title,
-                subtitle: warnCloseWindow.current
-                    ? String(localized: "settings.app.warnBeforeClosingWindow.subtitleOn", defaultValue: "Show a confirmation before closing a window with a running process, or all of a window's workspaces at once.")
-                    : String(localized: "settings.app.warnBeforeClosingWindow.subtitleOff", defaultValue: "Windows close immediately without confirmation.")
-            ) {
-                Toggle("", isOn: Binding(get: { warnCloseWindow.current }, set: { warnCloseWindow.set($0) }))
-                    .labelsHidden()
-                    .controlSize(.small)
-            }
-            SettingsCardDivider()
+            AppCloseConfirmationSettingsRows(
+                catalog: catalog,
+                warnWorkspace: warnCloseWorkspace,
+                warnWindow: warnCloseWindow,
+                alwaysConfirmWorkspaceClose: alwaysConfirmWorkspaceClose,
+                alwaysConfirmWindowClose: alwaysConfirmWindowClose
+            )
 
             // Hide Tab Close Button
             SettingsCardRow(

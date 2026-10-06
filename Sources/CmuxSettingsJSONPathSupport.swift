@@ -209,14 +209,10 @@ enum AppSettingsFileMapping {
             jsonKey: "warnBeforeClosingTabXButton",
             defaultsKey: app.warnBeforeClosingTabXButton.userDefaultsKey
         ),
-        .init(
-            jsonKey: "warnBeforeClosingWorkspace",
-            defaultsKey: app.warnBeforeClosingWorkspace.userDefaultsKey
-        ),
-        .init(
-            jsonKey: "warnBeforeClosingWindow",
-            defaultsKey: app.warnBeforeClosingWindow.userDefaultsKey
-        ),
+        .init(jsonKey: "warnBeforeClosingWorkspace", defaultsKey: app.warnBeforeClosingWorkspace.userDefaultsKey),
+        .init(jsonKey: "warnBeforeClosingWindow", defaultsKey: app.warnBeforeClosingWindow.userDefaultsKey),
+        .init(jsonKey: "alwaysConfirmWorkspaceClose", defaultsKey: app.alwaysConfirmWorkspaceClose.userDefaultsKey),
+        .init(jsonKey: "alwaysConfirmWindowClose", defaultsKey: app.alwaysConfirmWindowClose.userDefaultsKey),
         .init(
             jsonKey: "hideTabCloseButton",
             defaultsKey: app.hideTabCloseButton.userDefaultsKey

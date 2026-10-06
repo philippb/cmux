@@ -503,12 +503,10 @@ enum CommandPaletteSettingsToggleCommands {
                 defaultValue: AppCatalogSection().warnBeforeClosingTabXButton.defaultValue,
                 defaultsKey: AppCatalogSection().warnBeforeClosingTabXButton.userDefaultsKey
             ),
-            CommandPaletteSettingToggleDescriptor(
-                userFacing: SettingCatalog().app.warnBeforeClosingWorkspace
-            ),
-            CommandPaletteSettingToggleDescriptor(
-                userFacing: SettingCatalog().app.warnBeforeClosingWindow
-            ),
+            CommandPaletteSettingToggleDescriptor(userFacing: SettingCatalog().app.warnBeforeClosingWorkspace),
+            CommandPaletteSettingToggleDescriptor(userFacing: SettingCatalog().app.warnBeforeClosingWindow),
+            CommandPaletteSettingToggleDescriptor(userFacing: SettingCatalog().app.alwaysConfirmWorkspaceClose),
+            CommandPaletteSettingToggleDescriptor(userFacing: SettingCatalog().app.alwaysConfirmWindowClose),
             CommandPaletteSettingToggleDescriptor(
                 userFacing: SettingCatalog().app.hideTabCloseButton
             ),

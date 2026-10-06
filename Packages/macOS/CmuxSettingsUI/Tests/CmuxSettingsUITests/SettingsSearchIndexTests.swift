@@ -63,6 +63,8 @@ struct SettingsSearchIndexTests {
             catalog.app.warnBeforeClosingTab,
             catalog.app.warnBeforeClosingWorkspace,
             catalog.app.warnBeforeClosingWindow,
+            catalog.app.alwaysConfirmWorkspaceClose,
+            catalog.app.alwaysConfirmWindowClose,
             catalog.app.hideTabCloseButton,
             catalog.app.renameSelectsExistingName,
         ]
