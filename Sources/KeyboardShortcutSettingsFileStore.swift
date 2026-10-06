@@ -463,6 +463,11 @@ final class CmuxSettingsFileStore {
         } else if root.keys.contains("notifications") {
             logInvalid("notifications", sourcePath: sourcePath)
         }
+        if let workspaceColorsSection = root["workspaceColors"] as? [String: Any] {
+            parseWorkspaceColorsSection(workspaceColorsSection, sourcePath: sourcePath, snapshot: &snapshot)
+        } else if root.keys.contains("workspaceColors") {
+            logInvalid("workspaceColors", sourcePath: sourcePath)
+        }
         if let sidebarSection = root["sidebar"] as? [String: Any] {
             parseSidebarSection(sidebarSection, sourcePath: sourcePath, snapshot: &snapshot)
         } else if root.keys.contains("sidebar") {
@@ -970,6 +975,7 @@ final class CmuxSettingsFileStore {
         sourcePath: String,
         snapshot: inout ResolvedSettingsSnapshot
     ) {
+        parseClassicBrowserCatalogCoverage(section, sourcePath: sourcePath, snapshot: &snapshot)
         let browserSearchSettings = BrowserSearchSettingsStore()
 
         if section.keys.contains("defaultZoomLevel") {
@@ -1013,7 +1019,6 @@ final class CmuxSettingsFileStore {
         }
         _ = parseBrowserMemorySaverSettings(section, sourcePath: sourcePath, snapshot: &snapshot)
         applyNormalizedStringArraySettings(BrowserSettingsFileMapping.stringArraySettings, from: section, sourcePath: sourcePath, snapshot: &snapshot)
-        parseClassicBrowserCatalogCoverage(section, sourcePath: sourcePath, snapshot: &snapshot)
     }
 
     private func parseWorkspaceGroupsSection(
