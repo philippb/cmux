@@ -1286,6 +1286,12 @@
       "title" : "Minimal Mode",
       "type" : "string"
     },
+    "sidebar.nestedTabs" : {
+      "default" : false,
+      "description" : "Adds an arrow to each workspace that lists its tabs and chats beneath it.",
+      "title" : "Expandable Workspaces",
+      "type" : "boolean"
+    },
     "sidebar.pinnedBandsScroll" : {
       "default" : true,
       "description" : "Off: the top and bottom sections never scroll and the workspace list gets smaller.",
@@ -1304,6 +1310,12 @@
       ],
       "title" : "Section Look",
       "type" : "string"
+    },
+    "sidebar.showCounts" : {
+      "default" : false,
+      "description" : "Shows how many tabs each workspace has.",
+      "title" : "Show Tab Counts",
+      "type" : "boolean"
     },
     "sidebar.showWorkspaceTabs" : {
       "default" : false,

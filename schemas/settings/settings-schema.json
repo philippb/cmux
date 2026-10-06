@@ -7541,6 +7541,100 @@
     },
     {
       "accepts" : [
+        true,
+        false
+      ],
+      "agent_refusal" : null,
+      "agent_settable" : true,
+      "consumers" : [
+        "cmux-next"
+      ],
+      "default" : false,
+      "default_label" : null,
+      "group" : {
+        "key" : "settings.group.sidebar",
+        "text" : "Sidebar"
+      },
+      "help" : {
+        "key" : "settings.sidebar.nestedTabs.help",
+        "text" : "Adds an arrow to each workspace that lists its tabs and chats beneath it."
+      },
+      "kept_on_reset_all" : false,
+      "key" : "sidebar.nestedTabs",
+      "keywords" : [
+        "sidebar",
+        "workspace",
+        "tabs",
+        "chats",
+        "nested",
+        "expand",
+        "disclosure"
+      ],
+      "kind" : "toggle",
+      "path" : [
+        "sidebar",
+        "nestedTabs"
+      ],
+      "refuses" : [
+        "true",
+        1,
+        null
+      ],
+      "section" : "appearance",
+      "title" : {
+        "key" : "settings.sidebar.nestedTabs",
+        "text" : "Expandable Workspaces"
+      },
+      "validation" : "portable"
+    },
+    {
+      "accepts" : [
+        true,
+        false
+      ],
+      "agent_refusal" : null,
+      "agent_settable" : true,
+      "consumers" : [
+        "cmux-next"
+      ],
+      "default" : false,
+      "default_label" : null,
+      "group" : {
+        "key" : "settings.group.sidebar",
+        "text" : "Sidebar"
+      },
+      "help" : {
+        "key" : "settings.sidebar.showCounts.help",
+        "text" : "Shows how many tabs each workspace has."
+      },
+      "kept_on_reset_all" : false,
+      "key" : "sidebar.showCounts",
+      "keywords" : [
+        "sidebar",
+        "workspace",
+        "tabs",
+        "count",
+        "number"
+      ],
+      "kind" : "toggle",
+      "path" : [
+        "sidebar",
+        "showCounts"
+      ],
+      "refuses" : [
+        "true",
+        1,
+        null
+      ],
+      "section" : "appearance",
+      "title" : {
+        "key" : "settings.sidebar.showCounts",
+        "text" : "Show Tab Counts"
+      },
+      "validation" : "portable"
+    },
+    {
+      "accepts" : [
         "off",
         "bottom",
         "top",
@@ -11070,7 +11164,7 @@
       "validation" : "portable"
     }
   ],
-  "schema_hash" : "3f47e173d2b2e66b26fa5b89991981a4b86822535337a9d7915419baa5ffb179",
+  "schema_hash" : "5782d97184d10c92af70cfa559bfbe55ec2c5ffbcb9b98bec52a01fc1fcf8de0",
   "sections" : [
     {
       "id" : "general",
