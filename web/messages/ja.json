@@ -3267,6 +3267,8 @@
           "devWindowDisplay": "新しいウィンドウを開くときに DEBUG ビルドでのみ使用するディスプレイ名です。空の値ではシステムのデフォルトを使用します。",
           "warnBeforeQuit": "終了確認用の従来の boolean フォールバックです。新しい設定では app.confirmQuit を使ってください。",
           "warnBeforeClosingTabXButton": "タブの閉じるボタンでタブを閉じる前に確認を表示します。",
+          "alwaysConfirmWorkspaceClose": "ワークスペースを操作で閉じる際に、条件付きの終了警告とは別に常に確認を求めます。非対話型のCLI/APIによる終了や、アプリ終了時の確認には影響しません。",
+          "alwaysConfirmWindowClose": "ウィンドウを操作で閉じる際に、条件付きの終了警告とは別に常に確認を求めます。非対話型のCLI/APIによる終了や、アプリ終了時の確認には影響しません。",
           "hideTabCloseButton": "ペインのタブバーでタブの閉じるボタンを非表示にします。",
           "tabBarVisibility": "ペインがタブバーを描画するタイミングを決めます。\"always\" はタブが 1 つだけのペインでも描画し、\"multiple-tabs\" はペインのタブが 1 つの間は隠し、2 つ目のタブが開かれた時点で描画します。ミニマルモード (app.minimalMode) では常に描画されます。最上部のペインのタブバーがウインドウのタイトルバーを兼ねているためです。",
           "forkConversationDefaultDestination": "タブのコンテキストメニューにある主要な「会話をフォーク」操作のデフォルトのフォーク先です。サブメニューには引き続きすべてのフォーク先が表示されます。",

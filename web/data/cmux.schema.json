@@ -823,11 +823,13 @@
         "alwaysConfirmWorkspaceClose": {
           "type": "boolean",
           "default": false,
+          "descriptionKey": "schemaDescriptions.app.alwaysConfirmWorkspaceClose",
           "description": "Always require confirmation for interactive workspace closures, independently of conditional close warnings. Does not affect noninteractive CLI/API closure or Quit confirmation."
         },
         "alwaysConfirmWindowClose": {
           "type": "boolean",
           "default": false,
+          "descriptionKey": "schemaDescriptions.app.alwaysConfirmWindowClose",
           "description": "Always require confirmation for interactive window closures, independently of conditional close warnings. Does not affect noninteractive CLI/API closure or Quit confirmation."
         },
         "hideTabCloseButton": {

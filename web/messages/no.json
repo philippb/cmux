@@ -2131,6 +2131,8 @@
           "devWindowDisplay": "Skjermnavn som bare brukes i DEBUG-bygg når nye vinduer åpnes. En tom verdi bruker systemstandarden.",
           "warnBeforeQuit": "Eldre boolsk fallback for avslutningsbekreftelse. Bruk app.confirmQuit for nye konfigurasjoner.",
           "warnBeforeClosingTabXButton": "Vis en bekreftelse før en fane lukkes med fanens lukkeknapp.",
+          "alwaysConfirmWorkspaceClose": "Krev alltid bekreftelse ved interaktiv lukking av arbeidsområder, uavhengig av betingede lukkeadvarsler. Påvirker ikke ikke-interaktiv lukking via CLI/API eller bekreftelse ved avslutning.",
+          "alwaysConfirmWindowClose": "Krev alltid bekreftelse ved interaktiv lukking av vinduer, uavhengig av betingede lukkeadvarsler. Påvirker ikke ikke-interaktiv lukking via CLI/API eller bekreftelse ved avslutning.",
           "hideTabCloseButton": "Skjul lukkeknapper for faner i faneraden i ruten.",
           "tabBarVisibility": "Bestemmer når en rute tegner faneraden sin. \"always\" tegner den selv for en rute med bare én fane; \"multiple-tabs\" skjuler den så lenge ruten har én fane, og tegner den så snart en fane nummer to åpnes. Minimal modus (app.minimalMode) tegner den alltid, fordi faneraden til den øverste ruten der også fungerer som vinduets tittellinje.",
           "forkConversationDefaultDestination": "Standardmål for den primære Fork Conversation-handlingen i fanehurtigmenyen. Undermenyen viser fortsatt alle mål.",

@@ -2131,6 +2131,8 @@
           "devWindowDisplay": "僅在 DEBUG 建置中開啟新視窗時使用的顯示器名稱。空值會使用系統預設值。",
           "warnBeforeQuit": "用於退出確認的舊版布林後備值。新設定請使用 app.confirmQuit。",
           "warnBeforeClosingTabXButton": "使用分頁關閉按鈕關閉分頁前顯示確認。",
+          "alwaysConfirmWorkspaceClose": "互動式關閉工作區時一律要求確認，不受條件式關閉警告影響。不影響非互動式CLI/API關閉或結束應用程式的確認。",
+          "alwaysConfirmWindowClose": "互動式關閉視窗時一律要求確認，不受條件式關閉警告影響。不影響非互動式CLI/API關閉或結束應用程式的確認。",
           "hideTabCloseButton": "在窗格分頁列中隱藏分頁關閉按鈕。",
           "tabBarVisibility": "決定窗格何時繪製其分頁列。\"always\" 即使窗格只有一個分頁也會繪製；\"multiple-tabs\" 在窗格只有一個分頁時隱藏，開啟第二個分頁後繪製。極簡模式（app.minimalMode）一律繪製，因為該模式下最上方窗格的分頁列同時充當視窗標題列。",
           "forkConversationDefaultDestination": "分頁內容選單中主要 Fork Conversation 動作的預設目標。子選單仍會顯示所有目標。",
