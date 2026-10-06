@@ -15,7 +15,7 @@ struct AlwaysConfirmCloseTests {
     enum WorkspaceCloseAction: CaseIterable {
         case workspace, gesture, button
 
-        func close(_ workspace: Workspace, using manager: TabManager) -> Bool {
+        @MainActor func close(_ workspace: Workspace, using manager: TabManager) -> Bool {
             switch self {
             case .workspace: return manager.closeWorkspaceWithConfirmation(workspace)
             case .gesture: return manager.closeWorkspaceFromCloseTabGesture(workspace)
