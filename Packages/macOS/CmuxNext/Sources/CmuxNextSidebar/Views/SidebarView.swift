@@ -377,11 +377,11 @@ public final class SidebarView: NSView {
             || lastState?.preferences.showWorkspaceTabs != state.preferences.showWorkspaceTabs
             || lastState?.preferences.nestedTabs != state.preferences.nestedTabs || lastState?.preferences.showCounts != state.preferences.showCounts
         let previous = lastState?.sections
-        model.showWorkspaceTabs = state.preferences.showWorkspaceTabs
-        model.nestedTabs = state.preferences.nestedTabs
-        model.showCounts = state.preferences.showCounts
-        // Minimal mode changed: show or hide the chosen bands now.
-        if lastState?.preferences.minimalMode != state.preferences.minimalMode { setChromeRevealed(isChromeRevealed) }
+        model.applyListPreferences(state.preferences)
+        // Minimal mode or an item's control changed: show or hide the chosen bands now.
+        if lastState?.preferences.minimalMode != state.preferences.minimalMode || lastState?.itemInfo != state.itemInfo {
+            setChromeRevealed(isChromeRevealed)
+        }
         if listChanged {
             if profileChanged {
                 switchSpace(from: lastState?.activeProfile, to: state.activeProfile, profiles: state.profiles, oldSections: previous ?? [])

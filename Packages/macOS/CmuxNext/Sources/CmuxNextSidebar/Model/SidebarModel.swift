@@ -239,6 +239,13 @@ public final class SidebarModel {
         return true
     }
 
+    /// The `sidebar.*` settings that shape the workspace list.
+    func applyListPreferences(_ preferences: SidebarSectionsPreferences) {
+        showWorkspaceTabs = preferences.showWorkspaceTabs
+        nestedTabs = preferences.nestedTabs
+        showCounts = preferences.showCounts
+    }
+
     /// The disclosure on a workspace row: list its tabs inline, or stop.
     public func toggleNestedTabs(_ id: WorkspaceID) {
         if expandedWorkspaces.remove(id) == nil { expandedWorkspaces.insert(id) }
