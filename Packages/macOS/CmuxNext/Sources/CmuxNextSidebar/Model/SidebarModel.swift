@@ -43,6 +43,13 @@ public final class SidebarModel {
     @ObservationIgnored public var onCardAction: ((String, SidebarCardAction) -> Void)?
     /// Whether each workspace expands to show its intra-workspace tabs.
     public var showWorkspaceTabs = false
+    /// Workspace rows get a disclosure that lists their tabs inline
+    /// (`sidebar.nestedTabs`).
+    public var nestedTabs = false
+    /// The workspaces whose tabs the disclosure opened: window view state.
+    public var expandedWorkspaces: Set<WorkspaceID> = []
+    /// Workspace rows show their tab count (`sidebar.showCounts`).
+    public var showCounts = false
     /// Machine sections list loose workspaces before groups (a daemon-backed
     /// sidebar: cmux-tui keeps no slot for one after a group), so a drag
     /// never offers a slot past the first group.
@@ -230,6 +237,11 @@ public final class SidebarModel {
         guard let position = KeyboardReorder.target(moving: ids, direction: direction, in: sections) else { return false }
         send(.reorder(ids, to: position))
         return true
+    }
+
+    /// The disclosure on a workspace row: list its tabs inline, or stop.
+    public func toggleNestedTabs(_ id: WorkspaceID) {
+        if expandedWorkspaces.remove(id) == nil { expandedWorkspaces.insert(id) }
     }
 
     // MARK: Presentation

@@ -12,6 +12,8 @@ public nonisolated enum SidebarSectionsSetting {
     static let legacyScrollPath = ["sidebar", "stickyBandsScroll"]
     public static let showWorkspaceTabsPath = ["sidebar", "showWorkspaceTabs"]
     public static let minimalModePath = ["sidebar", "minimalMode"]
+    public static let nestedTabsPath = ["sidebar", "nestedTabs"]
+    public static let showCountsPath = ["sidebar", "showCounts"]
 
     static func minimalModeDescriptor(group: SettingText) -> SettingDescriptor {
         SettingDescriptor(minimalModePath, section: .appearance, group: group,
@@ -36,6 +38,23 @@ public nonisolated enum SidebarSectionsSetting {
                           kind: .toggle, default: .bool(SidebarSectionsPreferences.defaults.showWorkspaceTabs),
                           keywords: ["sidebar", "workspace", "tabs"])
     }
+    static func nestedTabsDescriptor(group: SettingText) -> SettingDescriptor {
+        SettingDescriptor(nestedTabsPath, section: .appearance, group: group,
+                          title: SettingsText.keyed("settings.sidebar.nestedTabs", "Expandable Workspaces"),
+                          help: SettingsText.keyed("settings.sidebar.nestedTabs.help",
+                                                   "Adds an arrow to each workspace that lists its tabs and chats beneath it."),
+                          kind: .toggle, default: .bool(SidebarSectionsPreferences.defaults.nestedTabs),
+                          keywords: ["sidebar", "workspace", "tabs", "chats", "nested", "expand", "disclosure"])
+    }
+
+    static func showCountsDescriptor(group: SettingText) -> SettingDescriptor {
+        SettingDescriptor(showCountsPath, section: .appearance, group: group,
+                          title: SettingsText.keyed("settings.sidebar.showCounts", "Show Tab Counts"),
+                          help: SettingsText.keyed("settings.sidebar.showCounts.help", "Shows how many tabs each workspace has."),
+                          kind: .toggle, default: .bool(SidebarSectionsPreferences.defaults.showCounts),
+                          keywords: ["sidebar", "workspace", "tabs", "count", "number"])
+    }
+
     /// The looks the setting accepts (CmuxNextSidebar.SectionsLookVariant).
     public static let looks = ["quiet", "card", "tray", "lines", "linesIcons"]
 
@@ -83,7 +102,18 @@ public nonisolated enum SidebarSectionsSetting {
                 diagnostics.append(SettingsDiagnostic(kind: .invalidValue, path: "sidebar.showWorkspaceTabs", message: "expected true or false"))
             }
         }
+        result.nestedTabs = flag(root, nestedTabsPath, fallback: result.nestedTabs, &diagnostics)
+        result.showCounts = flag(root, showCountsPath, fallback: result.showCounts, &diagnostics)
         return result
+    }
+
+    private static func flag(_ root: JSONValue, _ path: [String], fallback: Bool, _ diagnostics: inout [SettingsDiagnostic]) -> Bool {
+        guard let value = root.value(at: path) else { return fallback }
+        guard let flag = value.boolValue else {
+            diagnostics.append(SettingsDiagnostic(kind: .invalidValue, path: path.joined(separator: "."), message: "expected true or false"))
+            return fallback
+        }
+        return flag
     }
 
     private static func share(_ root: JSONValue, _ path: [String], _ name: String, fallback: Double,

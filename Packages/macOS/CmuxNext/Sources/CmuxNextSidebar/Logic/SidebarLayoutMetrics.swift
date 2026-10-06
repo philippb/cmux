@@ -59,6 +59,12 @@ public nonisolated struct SidebarLayoutOptions: Hashable, Sendable {
     public var showsSoleMachineHeader = false
     /// Include tab rows beneath each visible workspace.
     public var showWorkspaceTabs = false
+    /// Each workspace row gets a disclosure that lists its tabs inline
+    /// (`sidebar.nestedTabs`); `expandedWorkspaces` are the open ones.
+    public var nestedTabs = false
+    public var expandedWorkspaces: Set<WorkspaceID> = []
+    /// Workspace rows show their tab count (`sidebar.showCounts`).
+    public var showCounts = false
 
     public init() {}
 }

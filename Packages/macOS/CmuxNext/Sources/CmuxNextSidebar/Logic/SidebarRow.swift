@@ -13,6 +13,14 @@ public nonisolated enum SidebarRowKey: Hashable, Sendable {
     case emptySection(SectionID)
 }
 
+/// A workspace row's control for listing its tabs inline (`sidebar.nestedTabs`).
+public nonisolated enum SidebarTabDisclosure: Hashable, Sendable {
+    /// The workspace has no tabs: the control's place stays, drawn empty.
+    case empty
+    case collapsed
+    case expanded
+}
+
 /// One laid-out row in document (flipped) coordinates.
 public nonisolated struct SidebarRow: Hashable, Sendable {
     public var key: SidebarRowKey
@@ -36,6 +44,11 @@ public nonisolated struct SidebarRow: Hashable, Sendable {
     public var groupColor: GroupColor?
     /// Kind of tab represented by this row, when applicable.
     public var tabKind: SidebarTabKind? = nil
+    /// A workspace row's tab disclosure; nil when `sidebar.nestedTabs` is off
+    /// (or every workspace already lists its tabs).
+    public var tabDisclosure: SidebarTabDisclosure? = nil
+    /// A workspace row's tab count, when `sidebar.showCounts` is on.
+    public var tabCount: Int? = nil
 
     public var maxY: CGFloat { y + height }
 }
