@@ -199,6 +199,22 @@ struct AlwaysConfirmCloseTests {
 @MainActor
 @Suite(.serialized)
 struct AlwaysConfirmWindowCloseTests {
+    @Test func automaticShellExitKeepsExistingWindowClosePolicy() throws {
+        try withWindow(alwaysWindow: true) { app, window, manager in
+            let workspace = try #require(manager.selectedWorkspace)
+            var prompts = 0
+            var cancellations = 0
+            app.debugCloseMainWindowConfirmationHandler = { _ in prompts += 1; return true }
+
+            app.closeMainWindowContainingTabId(workspace.id, recordHistory: false,
+                                              onCancelled: { cancellations += 1 })
+
+            #expect(prompts == 0)
+            #expect(cancellations == 0)
+            #expect(!window.isVisible)
+        }
+    }
+
     @Test(arguments: [true, false])
     func cancelledWindowClosePreservesIdleWindow(_ titlebar: Bool) throws {
         try withWindow(alwaysWindow: true) { app, window, manager in
