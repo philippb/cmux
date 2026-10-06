@@ -292,7 +292,8 @@ mismatched token, and `origin.confirmation.issue` on a page relay fail with
 operation may return it.
 
 `apps.install`, `apps.uninstall`, `apps.enable` and
-`workspace.agent_folder.set` need origin `user`. A
+`workspace.agent_folder.set` need origin `user`, whatever the spelling of
+the operation name (a `\u` escape included). A
 refusal is `origin.forbidden` with the message "needs a verified cmux app
 connection" and details `{"required": "user", "derived": <origin>}`.
 
