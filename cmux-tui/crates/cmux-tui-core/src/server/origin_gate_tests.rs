@@ -503,3 +503,32 @@ fn another_process_cannot_use_an_install_proved_confirmation() {
     assert_forbidden(&send(&mux, &foreign_relay, &install(Some(user_claim(&token)))));
     assert_not_forbidden(&send(&mux, &app_relay, &install(Some(user_claim(&token)))));
 }
+
+/// `workspace.agent_folder.set` (AGENT-CWD-FOR-FOLDERLESS-WORKSPACE): only
+/// the user sets where a workspace's agents run. An agent connection (a Web
+/// or Peer client reaches the daemon no other way), a page relay and an app
+/// are refused by gate A2 before the request is parsed; a verified app passes.
+fn agent_folder(origin: Option<Value>) -> Value {
+    v2(
+        "workspace.agent_folder.set",
+        json!({"machine": "current", "session": "current", "workspace": "current", "path": null}),
+        Some("folder-1"),
+        origin,
+    )
+}
+
+#[test]
+fn only_a_verified_app_sets_a_workspace_agent_folder() {
+    let mux = mux("agent-folder");
+    let agent = connect(&mux);
+    assert_a2_refusal(&send(&mux, &agent, &agent_folder(None)), "agent");
+    let main = connect(&mux);
+    set_role_for_test(&mux, main.client, "main");
+    assert_a2_refusal(&send(&mux, &main, &agent_folder(None)), "agent");
+    let relay = relay(&mux, "token:30.1");
+    assert_forbidden(&send(&mux, &relay, &agent_folder(None)));
+    assert_forbidden(&send(&mux, &relay, &agent_folder(Some(json!({"claim": "user"})))));
+    let app = verified_app(&mux, "token:30.1");
+    assert_forbidden(&send(&mux, &app, &agent_folder(Some(json!({"claim": "app"})))));
+    assert_not_forbidden(&send(&mux, &app, &agent_folder(None)));
+}
