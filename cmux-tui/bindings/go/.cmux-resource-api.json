@@ -1,5 +1,5 @@
 {
-  "catalog_sha256": "c0b3333b38b3e1bb06bdf062ec53293fce5f25f6a7a983de979de471c65e082d",
+  "catalog_sha256": "5010d8acefb71cb91fea3058153ed66445bdebb5d69ccb8e744bf288b03834c3",
   "operations": {
     "agent.list": {
       "class": "read"
@@ -500,6 +500,9 @@
       "class": "read"
     },
     "window_record.put": {
+      "class": "mutation"
+    },
+    "workspace.agent_folder.set": {
       "class": "mutation"
     },
     "workspace.close": {
