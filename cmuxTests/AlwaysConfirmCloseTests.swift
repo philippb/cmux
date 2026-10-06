@@ -137,10 +137,11 @@ struct AlwaysConfirmCloseTests {
         }
     }
 
-    @Test(arguments: [true, false])
-    func lastSurfaceCloseHonorsWorkspaceProtection(_ button: Bool) throws {
+    @Test(arguments: [true, false], [true, false])
+    func lastSurfaceCloseHonorsWorkspaceProtection(_ button: Bool, _ remoteMirror: Bool) throws {
         try withManager(alwaysWorkspace: true) { manager in
             let workspace = manager.tabs[1]
+            workspace.isRemoteTmuxMirror = remoteMirror
             let panelId = try #require(workspace.focusedPanelId)
             let surfaceId = try #require(workspace.surfaceIdFromPanelId(panelId))
             let pane = try #require(workspace.bonsplitController.allPaneIds.first)
@@ -192,5 +193,118 @@ struct AlwaysConfirmCloseTests {
         }
         defer { manager.closeWorkspacesForTesting() }
         try body(manager)
+    }
+}
+
+@MainActor
+@Suite(.serialized)
+struct AlwaysConfirmWindowCloseTests {
+    @Test(arguments: [true, false])
+    func cancelledWindowClosePreservesIdleWindow(_ titlebar: Bool) throws {
+        try withWindow(alwaysWindow: true) { app, window, manager in
+            var prompts = 0
+            var suppressionOffered = false
+            app.debugCloseMainWindowConfirmationHandler = { _ in prompts += 1; return false }
+            app.debugCloseMainWindowDontAskAgainHandler = { _ in suppressionOffered = true; return true }
+            let workspaceIds = manager.tabs.map(\.id)
+
+            if titlebar { window.performClose(nil) }
+            else { _ = app.closeWindowWithConfirmation(window) }
+
+            #expect(prompts == 1)
+            #expect(!suppressionOffered)
+            #expect(window.isVisible)
+            #expect(manager.tabs.map(\.id) == workspaceIds)
+            #expect(manager.closeTabWarningDefaults.bool(forKey: "alwaysConfirmWindowClose"))
+        }
+    }
+
+    @Test(arguments: [true, false])
+    func acceptedWindowCloseCarriesConfirmation(_ titlebar: Bool) throws {
+        try withWindow(alwaysWindow: true) { app, window, _ in
+            var prompts = 0
+            var confirmations: [Bool] = []
+            app.debugCloseMainWindowConfirmationHandler = { _ in prompts += 1; return true }
+            app.mainWindowShouldCloseObserverForTesting = { _, confirmed in confirmations.append(confirmed) }
+
+            if titlebar { window.performClose(nil) }
+            else { _ = app.closeWindowWithConfirmation(window) }
+
+            #expect(prompts == 1)
+            #expect(confirmations == [true])
+        }
+    }
+
+    @Test func closingLastWorkspaceUsesOnePromptWithBothPreferencesEnabled() throws {
+        try withWindow(alwaysWorkspace: true, alwaysWindow: true) { app, window, manager in
+            let workspace = try #require(manager.selectedWorkspace)
+            var workspacePrompts = 0
+            var windowPrompts = 0
+            var confirmations: [Bool] = []
+            manager.confirmCloseHandler = { _, _, _ in workspacePrompts += 1; return true }
+            app.debugCloseMainWindowConfirmationHandler = { _ in windowPrompts += 1; return true }
+            app.mainWindowShouldCloseObserverForTesting = { target, confirmed in
+                if target === window { confirmations.append(confirmed) }
+            }
+
+            #expect(manager.closeWorkspaceWithConfirmation(workspace))
+            #expect(workspacePrompts == 1)
+            #expect(windowPrompts == 0)
+            #expect(confirmations == [true])
+        }
+    }
+
+    @Test func windowPreferenceProtectsLastWorkspaceEvenWithWorkspacePreferenceOff() throws {
+        try withWindow(alwaysWindow: true) { _, window, manager in
+            let workspace = try #require(manager.selectedWorkspace)
+            var prompts = 0
+            manager.confirmCloseHandler = { _, _, _ in prompts += 1; return false }
+
+            #expect(!manager.closeWorkspaceWithConfirmation(workspace))
+            #expect(prompts == 1)
+            #expect(window.isVisible)
+            #expect(manager.tabs.map(\.id) == [workspace.id])
+        }
+    }
+
+    private func withWindow(
+        alwaysWorkspace: Bool = false,
+        alwaysWindow: Bool = false,
+        body: (AppDelegate, NSWindow, TabManager) throws -> Void
+    ) throws {
+        let app = try #require(AppDelegate.shared)
+        let defaults = UserDefaults.standard
+        let values = ["alwaysConfirmWorkspaceClose": alwaysWorkspace,
+                      "alwaysConfirmWindowClose": alwaysWindow,
+                      "warnBeforeClosingWorkspace": false,
+                      "warnBeforeClosingWindow": false]
+        let originals = values.keys.map { ($0, defaults.object(forKey: $0)) }
+        for (key, value) in values { defaults.set(value, forKey: key) }
+        defer {
+            app.debugCloseMainWindowConfirmationHandler = nil
+            app.debugCloseMainWindowDontAskAgainHandler = nil
+            app.mainWindowShouldCloseObserverForTesting = nil
+            for (key, original) in originals {
+                if let original { defaults.set(original, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        let windowId = app.createMainWindow()
+        let window = try #require(NSApp.windows.first { $0.identifier?.rawValue == "cmux.main.\(windowId.uuidString)" })
+        let manager = try #require(app.tabManagerFor(windowId: windowId))
+        window.makeKeyAndOrderFront(nil)
+        for workspace in manager.tabs {
+            for panelId in workspace.panels.keys {
+                workspace.updatePanelShellActivityState(panelId: panelId, state: .promptIdle)
+            }
+        }
+        defer {
+            app.mainWindowShouldCloseObserverForTesting = nil
+            manager.closeWorkspacesForTesting()
+            app.suppressClosedWindowHistoryForTesting(windowId: windowId)
+            window.close()
+            app.forgetRecoverableMainWindowRoute(windowId: windowId)
+        }
+        try body(app, window, manager)
     }
 }
